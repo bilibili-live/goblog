@@ -47,6 +47,7 @@ func (ig *IBlog) Register() {
 	http.HandleFunc("/", ig.index)
 	http.HandleFunc("/index", ig.indexHtml)
 	http.HandleFunc("/ping", ig.pingPong)
+	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir("./public"))))
 }
 
 func (ig *IBlog) Run() error {
