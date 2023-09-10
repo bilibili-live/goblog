@@ -1,27 +1,16 @@
 package main
 
 import (
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
+	"d1y.io/study/conf"
+	"d1y.io/study/models"
+	"d1y.io/study/template"
 	cowsay "github.com/Code-Hex/Neo-cowsay/v2"
 )
-
-//go:embed template/index.html
-var indexHtmlData string
-
-type ResultVO struct {
-	Success bool   `json:"success"`
-	Msg     string `json:"msg"`
-	Data    any    `json:"data"`
-}
-
-func (ro *ResultVO) SetData(data any) {
-	ro.Data = data
-}
 
 type IBlog struct {
 	Port int
@@ -36,7 +25,7 @@ func newBlog(port int) *IBlog {
 func (ig *IBlog) index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var emptySlice = make([]string, 0)
-	var result = ResultVO{
+	var result = models.ResultVO{
 		Success: true,
 		Msg:     "获取成功",
 		Data:    emptySlice,
@@ -47,7 +36,7 @@ func (ig *IBlog) index(w http.ResponseWriter, r *http.Request) {
 
 func (ig *IBlog) indexHtml(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "html")
-	w.Write([]byte(indexHtmlData))
+	w.Write([]byte(template.IndexHtmlData))
 }
 
 func (ig *IBlog) pingPong(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +62,8 @@ func (ig *IBlog) Run() error {
 }
 
 func main() {
-	blog := newBlog(8080)
+	conf.Init()
+	blog := newBlog(conf.Instance.Port)
 	err := blog.Run()
 	if err != nil {
 		panic(err)
